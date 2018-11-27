@@ -10,11 +10,15 @@ import java.net.URL;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        User user = mapper.readValue(new URL("https://jsonplaceholder.typicode.com/users/1"), User.class);
 
-        List<Post> posts = mapper.readValue(new URL("https://jsonplaceholder.typicode.com/posts?userId=1"), new TypeReference<List<Post>>(){});
+    private static final String DOMAIN = "https://jsonplaceholder.typicode.com";
+
+    public static void main(String[] args) throws IOException {
+        String userId = "1";
+
+        ObjectMapper mapper = new ObjectMapper();
+        User user = mapper.readValue(new URL(DOMAIN + "/users/" + userId), User.class);
+        List<Post> posts = mapper.readValue(new URL(DOMAIN + "/posts?userId=" + userId), new TypeReference<List<Post>>(){});
         System.out.println(user);
         System.out.println(posts);
     }
