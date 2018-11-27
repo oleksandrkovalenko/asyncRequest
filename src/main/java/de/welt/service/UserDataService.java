@@ -7,7 +7,6 @@ import de.welt.domain.Post;
 import de.welt.domain.User;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.*;
@@ -17,36 +16,27 @@ public class UserDataService {
 
     private static final String DOMAIN = "https://jsonplaceholder.typicode.com";
     private static final Long TIMEOUT = 1000L;
+    private static final int N_THREADS = 10;
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private ExecutorService executor = Executors.newFixedThreadPool(2);
-
-//    public static void main(String[] args) {
-//        String userId = "1";
-//
-//        UserDataService main = new UserDataService();
-//        main.requestForUser(userId);
-//
-//    }
+    private ExecutorService executor = Executors.newFixedThreadPool(N_THREADS);
 
     public MergedResponse requestForUser(String userId) {
         try {
             return requestForUserWithThrow(userId);
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             //TODO: Add logging here
         } catch (TimeoutException e) {
             //TODO: Add logging here
         } catch (Exception e) {
             //TODO: Add logging here
-        } finally {
-            executor.shutdown();
         }
         //TODO Make response
         return null;
     }
 
-    private MergedResponse requestForUserWithThrow(String userId) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+    private MergedResponse requestForUserWithThrow(String userId) throws InterruptedException, ExecutionException, TimeoutException {
         Future<User> userFuture = executor.submit(createUserCallable(userId));
         Future<List<Post>> postFuture = executor.submit(createPostsCallable(userId));
 
@@ -54,9 +44,6 @@ public class UserDataService {
         List<Post> posts = postFuture.get(TIMEOUT, TimeUnit.MILLISECONDS);
 
         return new MergedResponse(user, posts);
-//        String response = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mergedResponse);
-//
-//        System.out.println(response);
     }
 
     private Callable<User> createUserCallable(String userId) {
