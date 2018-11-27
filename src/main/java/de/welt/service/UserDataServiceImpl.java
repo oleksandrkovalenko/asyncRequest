@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.welt.domain.MergedResponse;
 import de.welt.domain.Post;
 import de.welt.domain.User;
+import de.welt.executor.RequestExecutor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
@@ -16,11 +18,11 @@ public class UserDataServiceImpl implements UserDataService {
 
     private static final String DOMAIN = "https://jsonplaceholder.typicode.com";
     private static final Long TIMEOUT = 1000L;
-    private static final int N_THREADS = 10;
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private ExecutorService executor = Executors.newFixedThreadPool(N_THREADS);
+    @Autowired
+    private RequestExecutor requestExecutor;
 
     public MergedResponse requestForUser(String userId) {
         try {
@@ -37,8 +39,8 @@ public class UserDataServiceImpl implements UserDataService {
     }
 
     private MergedResponse requestForUserWithThrow(String userId) throws InterruptedException, ExecutionException, TimeoutException {
-        Future<User> userFuture = executor.submit(createUserCallable(userId));
-        Future<List<Post>> postFuture = executor.submit(createPostsCallable(userId));
+        Future<User> userFuture = requestExecutor.submit(createUserCallable(userId));
+        Future<List<Post>> postFuture = requestExecutor.submit(createPostsCallable(userId));
 
         User user = userFuture.get(TIMEOUT, TimeUnit.MILLISECONDS);
         List<Post> posts = postFuture.get(TIMEOUT, TimeUnit.MILLISECONDS);
