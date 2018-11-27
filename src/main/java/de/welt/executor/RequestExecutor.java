@@ -5,6 +5,6 @@ import java.util.concurrent.Future;
 
 public interface RequestExecutor {
 
-    <T> Future<T> submit(Callable<T> userCallable);
+    <T> Future<T> submit(Callable<T> callable);
 
 }
