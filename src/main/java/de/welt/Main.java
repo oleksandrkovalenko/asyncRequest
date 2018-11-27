@@ -35,6 +35,10 @@ public class Main {
             //TODO: Add logging here
         } catch (TimeoutException e) {
             //TODO: Add logging here
+        } catch (Exception e) {
+            //TODO: Add logging here
+        } finally {
+            executor.shutdown();
         }
     }
 
