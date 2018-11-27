@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.welt.domain.MergedResponse;
 import de.welt.domain.Post;
 import de.welt.domain.User;
+import de.welt.exception.UserDataExecutionException;
 import de.welt.executor.RequestExecutor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 @Service
+@Slf4j
 public class UserDataServiceImpl implements UserDataService {
 
     private static final String DOMAIN = "https://jsonplaceholder.typicode.com";
@@ -28,14 +31,15 @@ public class UserDataServiceImpl implements UserDataService {
         try {
             return requestForUserWithThrow(userId);
         } catch (InterruptedException | ExecutionException e) {
-            //TODO: Add logging here
+            log.error("Execution error", e);
+            throw new UserDataExecutionException("Execution error");
         } catch (TimeoutException e) {
-            //TODO: Add logging here
+            log.error("Time out during execution", e);
+            throw new UserDataExecutionException("Time out during execution");
         } catch (Exception e) {
-            //TODO: Add logging here
+            log.error("General error", e);
+            throw new UserDataExecutionException("General error");
         }
-        //TODO Make response
-        return null;
     }
 
     private MergedResponse requestForUserWithThrow(String userId) throws InterruptedException, ExecutionException, TimeoutException {
