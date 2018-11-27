@@ -8,4 +8,6 @@ import lombok.Data;
 public class Post {
     private String id;
     private String userId;
+    private String title;
+    private String body;
 }
